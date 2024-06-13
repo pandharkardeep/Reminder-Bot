@@ -4,13 +4,14 @@ import datetime
 import asyncio
 import os
 
-# Replace with your actual API key and bot token
+# Load API keys and configuration from environment variables
+
 CLIST_API_KEY = os.getenv('CLIST_API_KEY')
 DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-GUILD_ID = int(os.getenv('GUILD_ID'))  # Replace with your Discord server ID
-CHANNEL_ID = int(os.getenv('CHANNEL_ID'))  # Replace with the channel ID where you want to send reminders
+CHANNEL_ID = int(os.getenv('CHANNEL_ID'))
 
-client = discord.Client(intents=discord.Intents.default())
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
 
 def get_upcoming_codeforces_contests():
     url = 'https://clist.by/api/v1/contest/'
@@ -28,7 +29,7 @@ def get_upcoming_codeforces_contests():
 
 async def send_contest_reminders():
     await client.wait_until_ready()
-    channel = client.get_channel(int(CHANNEL_ID))
+    channel = client.get_channel(CHANNEL_ID)
     while True:
         contests = get_upcoming_codeforces_contests()
         if contests:
@@ -45,5 +46,9 @@ async def send_contest_reminders():
 async def on_ready():
     print(f'Logged in as {client.user}')
 
-client.loop.create_task(send_contest_reminders())
-client.run(DISCORD_BOT_TOKEN)
+async def main():
+    await client.start(DISCORD_BOT_TOKEN)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
